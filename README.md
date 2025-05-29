@@ -11,12 +11,19 @@ Tooling
 
 ## Getting started
 
+Config for pgadmin (automates registering the database with pgadmin):
+
+```shell
+./pgadmin-dev-setup/setup.sh
+```
+
+Start the stack:
+
 ```shell
 docker-compose up
 ```
 
-Using PGAdmin:
+## Using PGAdmin
 
 - Load it here: http://localhost:8080/
-- Register a server (TODO automate)
-  - Servers -> register -> hostname = `postgres`
+- Servers -> postgres -> type in password (as in the `.env` file)
