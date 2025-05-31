@@ -34,7 +34,7 @@ public class UserService
         return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task<User?> CreateUser(CreateUserDto options, CancellationToken cancellationToken)
+    public async Task<User> CreateUser(CreateUserRequest options, CancellationToken cancellationToken)
     {
 
         var user = options.ToUser();
@@ -43,7 +43,7 @@ public class UserService
         return user;
     }
 
-    public async Task<User?> UpdateUser(Guid userId, UpdateUserDto options, CancellationToken cancellationToken)
+    public async Task<User?> UpdateUser(Guid userId, UpdateUserRequest options, CancellationToken cancellationToken)
     {
         var user = await _context.Users.FindAsync(userId);
         if (user is null)
@@ -74,6 +74,7 @@ public static class UserServiceLayerExtensions
     {
         return new UserDto()
         {
+            Id = user.Id,
             Email = user.Email,
             Name = user.Name,
             CreatedAt = user.CreatedAt,
@@ -81,7 +82,7 @@ public static class UserServiceLayerExtensions
         };
     }
 
-    public static User ToUser(this CreateUserDto dto)
+    public static User ToUser(this CreateUserRequest dto)
     {
         return new User()
         {

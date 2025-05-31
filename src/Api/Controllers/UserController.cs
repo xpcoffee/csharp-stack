@@ -6,7 +6,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/users")]
-public class UserController(UserService userService) : ControllerBase
+public class UserController(UserService userService, ILogger<UserController> logger) : ControllerBase
 {
 
     [HttpGet("{userId}")]
@@ -23,21 +23,24 @@ public class UserController(UserService userService) : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<PaginatedResponse<UserDto>>> ListUsers(PaginationOptionsDto? paginationOptions)
+    public async Task<ActionResult<PaginatedResponse<UserDto>>> ListUsers(ListUsersRequest? request)
     {
         Guid? cursor = null;
-        if (paginationOptions?.Cursor is not null)
+        if (request?.PaginationOptions?.Cursor is not null)
         {
-            if (!Guid.TryParse(paginationOptions.Cursor, out var c))
+            if (Guid.TryParse(request.PaginationOptions.Cursor, out var c))
             {
                 cursor = c;
+            }
+            else
+            {
                 return BadRequest("The given cursor is not valid.");
             }
 
         }
 
         var cancellationToken = CancellationToken.None;
-        var pageSize = paginationOptions?.PageSize ?? 50;
+        var pageSize = request?.PaginationOptions?.PageSize ?? 50;
         var users = await userService.ListUsers(cursor, pageSize, cancellationToken);
 
         var hasMoreResults = users.Count == pageSize;
@@ -52,15 +55,17 @@ public class UserController(UserService userService) : ControllerBase
     }
 
     [HttpPut]
-    public async Task<ActionResult<UserDto>> CreateUser(CreateUserDto options)
+    public async Task<ActionResult<UserDto>> CreateUser(CreateUserRequest options)
     {
         var cancellationToken = CancellationToken.None;
         var user = await userService.CreateUser(options, cancellationToken);
-        return Created();
+        logger.LogInformation("User created. ID {}", user.Id);
+        var routeValues = new { userId = user.Id };
+        return CreatedAtAction(nameof(GetUser), routeValues, user);
     }
 
-    [HttpPost]
-    public async Task<ActionResult<UserDto>> UpdateUser(Guid userId, UpdateUserDto options)
+    [HttpPost("{userId}")]
+    public async Task<ActionResult<UserDto>> UpdateUser(Guid userId, UpdateUserRequest options)
     {
         var cancellationToken = CancellationToken.None;
         var user = await userService.UpdateUser(userId, options, cancellationToken);
@@ -69,6 +74,7 @@ public class UserController(UserService userService) : ControllerBase
             return NotFound($"User with ID {userId} was not found");
         }
 
+        logger.LogInformation("User updated. ID {}", user.Id);
         return user.ToDto();
     }
 }

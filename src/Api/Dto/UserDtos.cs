@@ -11,7 +11,7 @@ public class UserDto
     public DateTime UpdatedAt { get; set; }
 }
 
-public class CreateUserDto
+public class CreateUserRequest
 {
     [Required]
     [StringLength(100, MinimumLength = 2)]
@@ -23,7 +23,7 @@ public class CreateUserDto
     public string Email { get; set; } = string.Empty;
 }
 
-public class UpdateUserDto
+public class UpdateUserRequest
 {
     [StringLength(100, MinimumLength = 2)]
     public string Name { get; set; } = string.Empty;
@@ -32,3 +32,10 @@ public class UpdateUserDto
     [StringLength(150)]
     public string Email { get; set; } = string.Empty;
 }
+
+
+public class ListUsersRequest
+{
+    public PaginationOptionsDto? PaginationOptions { get; set; }
+}
+

@@ -4,15 +4,15 @@ namespace Api.Dto;
 
 public class PaginationOptionsDto
 {
-    [Required]
-    public string Cursor = string.Empty;
+    public string? Cursor { get; set; }
 
-    [Range(0, 100)]
-    public int PageSize = 50;
+    [Required]
+    [Range(1, 100)]
+    public int PageSize { get; set; }
 }
 
 public class PaginatedResponse<T>
 {
-    public required IEnumerable<T> Items;
-    public required string? NextCursor;
+    public IEnumerable<T> Items { get; set; } = [];
+    public string? NextCursor { get; set; }
 }
