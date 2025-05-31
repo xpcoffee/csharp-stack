@@ -36,6 +36,25 @@ services:
     networks:
       - csharp-minimal-stack
 
+  api:
+    build:
+      context: ./src/Api
+      dockerfile: Dockerfile
+    container_name: api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8081
+      ConnectionStrings__DefaultConnection: "Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
+    ports:
+      - "8081:8081"
+    # depends_on:
+    # postgres:
+    #   condition: service_healthy
+    networks:
+      - csharp-minimal-stack
+    volumes:
+      - ./src/Api:/app/src
+
 networks:
   csharp-minimal-stack:
     driver: bridge

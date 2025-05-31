@@ -1,2 +1,5 @@
 .env
 pgadmin-dev-setup/output
+Debug
+obj
+.git
