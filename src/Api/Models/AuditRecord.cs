@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Api.Model;
 
-[Table("audit-records")]
+[Table("audit_records")]
 public class AuditRecord : Entity
 {
     [Column("timestamp")]

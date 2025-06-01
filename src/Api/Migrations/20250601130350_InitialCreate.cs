@@ -14,7 +14,7 @@ namespace Api.Migrations
             migrationBuilder.Sql("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";");
 
             migrationBuilder.CreateTable(
-                name: "audit-records",
+                name: "audit_records",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
@@ -25,7 +25,7 @@ namespace Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_audit-records", x => x.id);
+                    table.PrimaryKey("PK_audit_records", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -45,8 +45,8 @@ namespace Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_audit-records_target-id",
-                table: "audit-records",
+                name: "IX_audit_records_target-id",
+                table: "audit_records",
                 column: "target-id");
 
             migrationBuilder.CreateIndex(
@@ -60,7 +60,7 @@ namespace Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "audit-records");
+                name: "audit_records");
 
             migrationBuilder.DropTable(
                 name: "users");

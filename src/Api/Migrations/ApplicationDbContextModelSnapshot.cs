@@ -96,7 +96,7 @@ namespace Api.Migrations
 
                     b.HasIndex("TargetId");
 
-                    b.ToTable("audit-records");
+                    b.ToTable("audit_records");
                 });
 #pragma warning restore 612, 618
         }
