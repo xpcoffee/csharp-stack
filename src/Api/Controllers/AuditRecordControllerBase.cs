@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
-public class AuditRecordControllerBase(AuditRecordService auditRecordService) : ControllerBase
+public abstract class AuditRecordControllerBase(AuditRecordService auditRecordService) : ControllerBase
 {
     [HttpGet("{targetId}/audit-records")]
     public async Task<ActionResult<PaginatedResponse<AuditRecordDto>>> ListUsers(Guid targetId, ListAuditRecordsRequest? request)
