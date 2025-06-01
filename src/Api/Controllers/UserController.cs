@@ -54,7 +54,7 @@ public class UserController(UserService userService, ILogger<UserController> log
         return page;
     }
 
-    [HttpPut]
+    [HttpPost]
     public async Task<ActionResult<UserDto>> CreateUser(CreateUserRequest options)
     {
         var cancellationToken = CancellationToken.None;
@@ -64,7 +64,7 @@ public class UserController(UserService userService, ILogger<UserController> log
         return CreatedAtAction(nameof(GetUser), routeValues, user.ToDto());
     }
 
-    [HttpPost("{userId}")]
+    [HttpPut("{userId}")]
     public async Task<ActionResult<UserDto>> UpdateUser(Guid userId, UpdateUserRequest options)
     {
         var cancellationToken = CancellationToken.None;
@@ -89,7 +89,6 @@ public class UserController(UserService userService, ILogger<UserController> log
         }
 
         logger.LogInformation("User deleted. ID {}", user.Id);
-        var routeValues = new { userId = user.Id };
         return Ok(user.ToDto());
     }
 
