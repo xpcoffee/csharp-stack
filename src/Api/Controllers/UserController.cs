@@ -77,4 +77,34 @@ public class UserController(UserService userService, ILogger<UserController> log
         logger.LogInformation("User updated. ID {}", user.Id);
         return user.ToDto();
     }
+
+    [HttpDelete("{userId}")]
+    public async Task<ActionResult<UserDto>> DeleteUser(Guid userId)
+    {
+        var cancellationToken = CancellationToken.None;
+        var user = await userService.DeleteUser(userId, cancellationToken);
+        if (user is null)
+        {
+            return NotFound($"User with ID {userId} was not found");
+        }
+
+        logger.LogInformation("User deleted. ID {}", user.Id);
+        var routeValues = new { userId = user.Id };
+        return Ok(user.ToDto());
+    }
+
+    [HttpPut("{userId}")]
+    public async Task<ActionResult<UserDto>> UndeleteUser(Guid userId)
+    {
+        var cancellationToken = CancellationToken.None;
+        var user = await userService.UnDeleteUser(userId, cancellationToken);
+        if (user is null)
+        {
+            return NotFound($"Deleted user with ID {userId} was not found");
+        }
+
+        logger.LogInformation("User undeleted. ID {}", user.Id);
+        var routeValues = new { userId = user.Id };
+        return CreatedAtAction(nameof(GetUser), routeValues, user.ToDto());
+    }
 }

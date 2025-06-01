@@ -64,31 +64,36 @@ public class ApplicationDbContext : DbContext
         foreach (var entity in entities)
         {
             var auditedEntity = entity.Entity as AuditedEntity;
+            AuditRecord? auditRecord = null;
 
             if (auditedEntity is not null)
             {
                 switch (entity.State)
                 {
                     case EntityState.Added:
-                        var createdAuditRecord = AuditRecord.GetCreateAuditRecord(auditedEntity);
-                        createdAuditRecords.Add(createdAuditRecord);
-                        auditedEntity.CreatedAuditRecordId = createdAuditRecord.Id;
-
-                        var updatedAuditRecord = AuditRecord.GetUpdateAuditRecord(auditedEntity);
-                        createdAuditRecords.Add(updatedAuditRecord);
-                        auditedEntity.UpdatedAuditRecordId = updatedAuditRecord.Id;
+                        auditRecord = AuditRecord.GetCreateAuditRecord(auditedEntity);
+                        createdAuditRecords.Add(auditRecord);
+                        auditedEntity.CreatedAuditRecordId = auditRecord.Id;
+                        auditedEntity.UpdatedAuditRecordId = auditRecord.Id;
                         break;
 
                     case EntityState.Modified:
-                        var auditRecord = AuditRecord.GetUpdateAuditRecord(auditedEntity);
+                        auditRecord = auditedEntity.Tombstone
+                          ? AuditRecord.GetDeleteAuditRecord(auditedEntity)
+                          : AuditRecord.GetUpdateAuditRecord(auditedEntity);
                         createdAuditRecords.Add(auditRecord);
+
+                        if (auditedEntity.Tombstone)
+                        {
+                            auditedEntity.DeletedAuditRecordId = auditRecord.Id;
+                        }
                         auditedEntity.UpdatedAuditRecordId = auditRecord.Id;
                         break;
 
                     case EntityState.Deleted:
-                        var deletedAuditRecord = AuditRecord.GetDeleteAuditRecord(auditedEntity);
-                        createdAuditRecords.Add(deletedAuditRecord);
-                        auditedEntity.DeletedAuditRecordId = deletedAuditRecord.Id;
+                        // For hard-deletion
+                        auditRecord = AuditRecord.GetDropAuditRecord(auditedEntity);
+                        createdAuditRecords.Add(auditRecord);
                         break;
                 }
             }

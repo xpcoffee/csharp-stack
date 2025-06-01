@@ -17,7 +17,14 @@ public class UserService
 
     public async Task<User?> GetUserById(Guid userId, CancellationToken cancellationToken)
     {
-        return await _context.Users.FindAsync(userId);
+        var user = await _context.Users.FindAsync(userId);
+
+        if (user?.DeletedAuditRecordId is not null)
+        {
+            return null;
+        }
+
+        return user;
     }
 
     public async Task<List<User>> ListUsers(Guid? cursor, int pageSize, CancellationToken cancellationToken)
@@ -29,7 +36,11 @@ public class UserService
             query = query.Where(u => u.Id < cursor.Value);
         }
 
-        return await query.OrderByDescending(u => u.Id).Take(pageSize).ToListAsync(cancellationToken);
+        return await query
+          .Where(u => u.DeletedAuditRecordId == null)
+          .OrderByDescending(u => u.Id)
+          .Take(pageSize)
+          .ToListAsync(cancellationToken);
     }
 
     public async Task<User> CreateUser(CreateUserRequest options, CancellationToken cancellationToken)
@@ -40,10 +51,50 @@ public class UserService
         return user;
     }
 
-    public async Task<User?> UpdateUser(Guid userId, UpdateUserRequest options, CancellationToken cancellationToken)
+    public async Task<User?> DeleteUser(Guid userId, CancellationToken cancellationToken)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user is null || user.DeletedAuditRecordId is not null)
+        {
+            return null;
+        }
+
+        user.IsDeleted = true;
+
+        await _context.SaveChangesAsync(cancellationToken);
+        return user;
+    }
+
+    public async Task<User?> UnDeleteUser(Guid userId, CancellationToken cancellationToken)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user is null || user.DeletedAuditRecordId is null)
+        {
+            return null;
+        }
+
+        user.DeletedAuditRecordId = null;
+        await _context.SaveChangesAsync(cancellationToken);
+        return user;
+    }
+
+    public async Task<User?> DropUser(Guid userId, CancellationToken cancellationToken)
     {
         var user = await _context.Users.FindAsync(userId);
         if (user is null)
+        {
+            return null;
+        }
+        _context.Remove(user);
+
+        await _context.SaveChangesAsync(cancellationToken);
+        return user;
+    }
+
+    public async Task<User?> UpdateUser(Guid userId, UpdateUserRequest options, CancellationToken cancellationToken)
+    {
+        var user = await _context.Users.FindAsync(userId);
+        if (user is null || user.DeletedAuditRecordId is not null)
         {
             return null;
         }

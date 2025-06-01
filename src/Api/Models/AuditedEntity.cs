@@ -12,4 +12,8 @@ public class AuditedEntity : Entity
 
     [Column("deleted_audit_record_id")]
     public Guid? DeletedAuditRecordId { get; set; }
+
+    // Set to trigger a soft-deletion when saved.
+    [Column("is_deleted")]
+    public bool IsDeleted { get; set; }
 }
