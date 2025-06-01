@@ -9,6 +9,8 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
 
+    private HashSet<EntityState> AuditedStates = [EntityState.Modified, EntityState.Added, EntityState.Deleted];
+
     public ApplicationDbContext(DbContextOptions options) : base(options)
     {
     }
@@ -27,37 +29,74 @@ public class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.Email).IsUnique();
 
             entity.Property(e => e.Id).HasDefaultValueSql("uuid_generate_v4()");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
         }
         );
+
+        modelBuilder.Entity<AuditRecord>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.HasIndex(e => e.TargetId);
+
+            entity.Property(e => e.Id).HasDefaultValueSql("uuid_generate_v4()");
+            entity.Property(e => e.TimeStamp).HasDefaultValueSql("CURRENT_TIMESTAMP");
+        });
 
     }
 
     public override int SaveChanges()
     {
-        UpdateTimestamps();
+        TrackAuditRecords();
         return base.SaveChanges();
     }
 
     public async override Task<int> SaveChangesAsync(CancellationToken cancellationToken)
     {
-        UpdateTimestamps();
+        TrackAuditRecords();
         return await base.SaveChangesAsync(cancellationToken);
     }
 
-    private void UpdateTimestamps()
+    private void TrackAuditRecords()
     {
-        var users = ChangeTracker.Entries()
-          .Where(e => e.Entity is User && e.State == EntityState.Modified)
-          .Select(e => e.Entity as User);
+        var entities = ChangeTracker.Entries()
+          .Where(e => e.Entity is AuditedEntity && AuditedStates.Contains(e.State));
 
-        foreach (var user in users)
+        List<AuditRecord> createdAuditRecords = [];
+        foreach (var entity in entities)
         {
-            if (user is not null)
+            var auditedEntity = entity.Entity as AuditedEntity;
+
+            if (auditedEntity is not null)
             {
-                user.UpdatedAt = DateTime.UtcNow;
+                switch (entity.State)
+                {
+                    case EntityState.Added:
+                        var createdAuditRecord = AuditRecord.GetCreateAuditRecord(auditedEntity);
+                        createdAuditRecords.Add(createdAuditRecord);
+                        auditedEntity.CreatedAuditRecordId = createdAuditRecord.Id;
+
+                        var updatedAuditRecord = AuditRecord.GetUpdateAuditRecord(auditedEntity);
+                        createdAuditRecords.Add(updatedAuditRecord);
+                        auditedEntity.UpdatedAuditRecordId = updatedAuditRecord.Id;
+                        break;
+
+                    case EntityState.Modified:
+                        var auditRecord = AuditRecord.GetUpdateAuditRecord(auditedEntity);
+                        createdAuditRecords.Add(auditRecord);
+                        auditedEntity.UpdatedAuditRecordId = auditRecord.Id;
+                        break;
+
+                    case EntityState.Deleted:
+                        var deletedAuditRecord = AuditRecord.GetDeleteAuditRecord(auditedEntity);
+                        createdAuditRecords.Add(deletedAuditRecord);
+                        auditedEntity.DeletedAuditRecordId = deletedAuditRecord.Id;
+                        break;
+                }
             }
+        }
+
+        foreach (var auditRecord in createdAuditRecords)
+        {
+            base.Add(auditRecord);
         }
     }
 }
@@ -79,10 +118,12 @@ public static class ApplicationDbContextExtensions
             try
             {
                 logger.LogInformation("🔄 Connecting to database (attempt {Attempt})...", attempt);
-
                 await context.Database.CanConnectAsync();
+                logger.LogInformation("✅ Database connection established!");            // Apply any pending migrations
 
-                logger.LogInformation("✅ Database connection established!");
+                logger.LogInformation("🔧 Applying database migrations...");
+                await context.Database.MigrateAsync();
+                logger.LogInformation("✅ Database migrations completed!");
                 return;
             }
             catch (Exception ex)

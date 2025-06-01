@@ -36,7 +36,6 @@ public class UserService
 
     public async Task<User> CreateUser(CreateUserRequest options, CancellationToken cancellationToken)
     {
-
         var user = options.ToUser();
         _context.Add(user);
         await _context.SaveChangesAsync(cancellationToken);
@@ -60,7 +59,6 @@ public class UserService
         {
             user.Name = options.Name;
         }
-
         await _context.SaveChangesAsync(cancellationToken);
 
         return user;
@@ -77,8 +75,6 @@ public static class UserServiceLayerExtensions
             Id = user.Id,
             Email = user.Email,
             Name = user.Name,
-            CreatedAt = user.CreatedAt,
-            UpdatedAt = user.UpdatedAt
         };
     }
 
@@ -88,8 +84,6 @@ public static class UserServiceLayerExtensions
         {
             Name = dto.Name,
             Email = dto.Email,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow,
         };
     }
 }

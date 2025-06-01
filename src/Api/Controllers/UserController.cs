@@ -61,7 +61,7 @@ public class UserController(UserService userService, ILogger<UserController> log
         var user = await userService.CreateUser(options, cancellationToken);
         logger.LogInformation("User created. ID {}", user.Id);
         var routeValues = new { userId = user.Id };
-        return CreatedAtAction(nameof(GetUser), routeValues, user);
+        return CreatedAtAction(nameof(GetUser), routeValues, user.ToDto());
     }
 
     [HttpPost("{userId}")]
