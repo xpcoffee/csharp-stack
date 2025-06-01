@@ -61,3 +61,43 @@ public class ApplicationDbContext : DbContext
         }
     }
 }
+
+
+public static class ApplicationDbContextExtensions
+{
+    public static async Task WaitForDatabaseAsync(this IServiceProvider services)
+    {
+        using var scope = services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<ApplicationDbContext>>();
+
+        var attempt = 1;
+        var delay = 2;
+
+        while (true)
+        {
+            try
+            {
+                logger.LogInformation("🔄 Connecting to database (attempt {Attempt})...", attempt);
+
+                await context.Database.CanConnectAsync();
+
+                logger.LogInformation("✅ Database connection established!");
+                return;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("❌ Database connection failed (attempt {Attempt}): {Message}",
+                    attempt, ex.Message);
+
+                logger.LogInformation("⏳ Waiting {Delay} seconds before retry...", delay);
+
+                await Task.Delay(delay * 1000);
+
+                attempt++;
+                // Exponential backoff: 2s, 4s, 8s, 16s, 30s, 30s, 30s...
+                delay = Math.Min(delay * 2, 30);
+            }
+        }
+    }
+}
