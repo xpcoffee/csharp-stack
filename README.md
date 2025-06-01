@@ -3,6 +3,8 @@
 A CRUD stack running on Docker.
 
 - c# api
+  - basic CRUD for a user
+  - audit record functionality
 - postgres backend (with pgadmin)
 
 Tooling
@@ -13,19 +15,19 @@ Tooling
 
 Copy the sample environment variables and change the passwords etc:
 
-```sh
+```bash
 cp .env.sample .env
 ```
 
 Config for pgadmin (automates registering the database with pgadmin):
 
-```sh
+```bash
 ./pgadmin-dev-setup/setup.sh
 ```
 
 Start the stack:
 
-```sh
+```bash
 docker-compose up
 ```
 
@@ -36,7 +38,7 @@ docker-compose up
 
 A bit heavy handed, but the following will rebuild what's needed and restart the stack:
 
-```shell
+```bash
 docker-compose up --build
 ```
 
@@ -44,6 +46,6 @@ docker-compose up --build
 
 Make changes to the entities & then add a new migration:
 
-```sh
+```bash
 dotnet ef migrations add <NameOfMigration>
 ```
