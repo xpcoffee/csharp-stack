@@ -8,6 +8,7 @@ public class ApplicationDbContext : DbContext
 {
 
     public DbSet<User> Users { get; set; }
+    public DbSet<AuditRecord> AuditRecords { get; set; }
 
     private HashSet<EntityState> AuditedStates = [EntityState.Modified, EntityState.Added, EntityState.Deleted];
 

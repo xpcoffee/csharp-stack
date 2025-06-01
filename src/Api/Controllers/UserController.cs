@@ -6,7 +6,7 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/users")]
-public class UserController(UserService userService, ILogger<UserController> logger) : ControllerBase
+public class UserController(UserService userService, AuditRecordService auditRecordService, ILogger<UserController> logger) : AuditRecordControllerBase(auditRecordService)
 {
 
     [HttpGet("{userId}")]
@@ -92,7 +92,7 @@ public class UserController(UserService userService, ILogger<UserController> log
         return Ok(user.ToDto());
     }
 
-    [HttpPut("{userId}")]
+    [HttpPut("{userId}/undelete")]
     public async Task<ActionResult<UserDto>> UndeleteUser(Guid userId)
     {
         var cancellationToken = CancellationToken.None;
