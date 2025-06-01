@@ -22,16 +22,14 @@ public class UserService
 
     public async Task<List<User>> ListUsers(Guid? cursor, int pageSize, CancellationToken cancellationToken)
     {
-        var query = _context.Users.AsQueryable()
-          .OrderBy(u => u.Id)
-          .Take(pageSize);
+        var query = _context.Users.AsQueryable();
 
         if (cursor.HasValue)
         {
-            query = query.Where(u => u.Id > cursor.Value);
+            query = query.Where(u => u.Id < cursor.Value);
         }
 
-        return await query.ToListAsync(cancellationToken);
+        return await query.OrderByDescending(u => u.Id).Take(pageSize).ToListAsync(cancellationToken);
     }
 
     public async Task<User> CreateUser(CreateUserRequest options, CancellationToken cancellationToken)
