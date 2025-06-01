@@ -15,10 +15,15 @@ services:
     networks:
       - csharp-minimal-stack
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -u admin -d postgres"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -h localhost -p 5432 -U ${POSTGRES_USER} -d ${POSTGRES_DB}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -47,9 +52,9 @@ services:
       ConnectionStrings__DefaultConnection: "Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
     ports:
       - "8081:8081"
-    # depends_on:
-    # postgres:
-    #   condition: service_healthy
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - csharp-minimal-stack
     volumes:
