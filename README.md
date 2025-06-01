@@ -13,19 +13,19 @@ Tooling
 
 Copy the sample environment variables and change the passwords etc:
 
-```shell
+```sh
 cp .env.sample .env
 ```
 
 Config for pgadmin (automates registering the database with pgadmin):
 
-```shell
+```sh
 ./pgadmin-dev-setup/setup.sh
 ```
 
 Start the stack:
 
-```shell
+```sh
 docker-compose up
 ```
 
@@ -38,4 +38,12 @@ A bit heavy handed, but the following will rebuild what's needed and restart the
 
 ```shell
 docker-compose up --build
+```
+
+## Updating DB entities
+
+Make changes to the entities & then add a new migration:
+
+```sh
+dotnet ef migrations add <NameOfMigration>
 ```
