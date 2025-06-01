@@ -73,7 +73,7 @@ public class UserService
             return null;
         }
 
-        user.DeletedAuditRecordId = null;
+        user.IsDeleted = false;
         await _context.SaveChangesAsync(cancellationToken);
         return user;
     }

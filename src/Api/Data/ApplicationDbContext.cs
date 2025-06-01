@@ -78,15 +78,23 @@ public class ApplicationDbContext : DbContext
                         break;
 
                     case EntityState.Modified:
-                        auditRecord = auditedEntity.Tombstone
+                        auditRecord = auditedEntity.IsDeleted
                           ? AuditRecord.GetDeleteAuditRecord(auditedEntity)
                           : AuditRecord.GetUpdateAuditRecord(auditedEntity);
                         createdAuditRecords.Add(auditRecord);
 
-                        if (auditedEntity.Tombstone)
+                        // soft delete
+                        if (auditedEntity.IsDeleted)
                         {
                             auditedEntity.DeletedAuditRecordId = auditRecord.Id;
                         }
+
+                        // undelete
+                        if (auditedEntity is { IsDeleted: false, DeletedAuditRecordId: not null })
+                        {
+                            auditedEntity.DeletedAuditRecordId = null;
+                        }
+
                         auditedEntity.UpdatedAuditRecordId = auditRecord.Id;
                         break;
 
