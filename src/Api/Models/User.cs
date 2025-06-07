@@ -6,7 +6,7 @@ namespace Api.Model;
 
 
 [Table("users")]
-public class User : AuditedEntity
+public class User() : AuditedEntity(type: nameof(User))
 {
     [Column("name")]
     [StringLength(100)]

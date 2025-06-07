@@ -26,31 +26,31 @@ public class AuditRecord : Entity
     public static AuditRecord GetCreateAuditRecord(AuditedEntity item) => new AuditRecord
     {
         TargetId = item.Id,
-        TargetType = nameof(AuditedEntity),
+        TargetType = item.Type,
         Action = AuditRecordAction.Create
     };
     public static AuditRecord GetUpdateAuditRecord(AuditedEntity item) => new AuditRecord
     {
         TargetId = item.Id,
-        TargetType = nameof(AuditedEntity),
+        TargetType = item.Type,
         Action = AuditRecordAction.Update
     };
     public static AuditRecord GetAccessAuditRecord(AuditedEntity item) => new AuditRecord
     {
         TargetId = item.Id,
-        TargetType = nameof(AuditedEntity),
+        TargetType = item.Type,
         Action = AuditRecordAction.Access
     };
     public static AuditRecord GetDeleteAuditRecord(AuditedEntity item) => new AuditRecord
     {
         TargetId = item.Id,
-        TargetType = nameof(AuditedEntity),
+        TargetType = item.Type,
         Action = AuditRecordAction.Delete
     };
     public static AuditRecord GetDropAuditRecord(AuditedEntity item) => new AuditRecord
     {
         TargetId = item.Id,
-        TargetType = nameof(AuditedEntity),
+        TargetType = item.Type,
         Action = AuditRecordAction.Drop
     };
 }

@@ -2,8 +2,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Api.Model;
 
-public class AuditedEntity : Entity
+public partial class AuditedEntity(string type) : Entity
 {
+    [NotMapped]
+    public string Type { get; init; } = type;
+
     [Column("created_audit_record_id")]
     public Guid CreatedAuditRecordId { get; set; }
 
