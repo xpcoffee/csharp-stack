@@ -1,11 +1,13 @@
 using Api.Dto;
 using Api.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
 
 [ApiController]
 [Route("api/users")]
+[Authorize]
 public class UserController(UserService userService, AuditRecordService auditRecordService, ILogger<UserController> logger) : AuditRecordControllerBase(auditRecordService)
 {
 

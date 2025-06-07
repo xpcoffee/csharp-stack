@@ -1,6 +1,7 @@
+namespace Api.Model;
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Api.Model;
 
 [Table("audit_records")]
 public class AuditRecord : Entity
