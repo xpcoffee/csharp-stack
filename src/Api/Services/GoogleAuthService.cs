@@ -1,21 +1,19 @@
 namespace Api.Service;
 
+using Api.Configuration;
 using Api.Model;
 using Google.Apis.Auth;
+using Microsoft.Extensions.Options;
 
-public class GoogleAuthService(IConfiguration configuration)
+public class GoogleAuthService(IOptions<GoogleAuthOptions> configuration)
 {
-    private readonly IConfiguration _configuration = configuration;
-
     public async Task<GoogleUserInfo?> ValidateGoogleTokenAsync(string idToken)
     {
-        var clientId = _configuration["GoogleAuth:ClientId"] ?? throw new InvalidDataException("GoogleAuth:ClientId is not in config");
-
         try
         {
             var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, new GoogleJsonWebSignature.ValidationSettings
             {
-                Audience = new[] { clientId }
+                Audience = new[] { configuration.Value.ClientId }
             });
 
             return new GoogleUserInfo

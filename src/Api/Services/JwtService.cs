@@ -1,19 +1,18 @@
 namespace Api.Service;
 
+using Api.Configuration;
 using Api.Model;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-public class JwtService(IConfiguration configuration, ILogger<JwtService> logger)
+public class JwtService(IOptions<JwtOptions> configuration, ILogger<JwtService> logger)
 {
-    private readonly IConfiguration _configuration = configuration;
-
     public string GenerateToken(GoogleUserInfo userInfo)
     {
-        var jwtKey = _configuration["Jwt:Key"] ?? throw new InvalidDataException("Jwt:Key not found");
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.Value.Key));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         logger.LogInformation("{} {} {}", userInfo.Email, userInfo.Name, userInfo.Sub);
@@ -26,8 +25,8 @@ public class JwtService(IConfiguration configuration, ILogger<JwtService> logger
         };
 
         var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
+            issuer: configuration.Value.Issuer,
+            audience: configuration.Value.Audience,
             claims: claims,
             expires: DateTime.UtcNow.AddHours(24),
             signingCredentials: credentials
