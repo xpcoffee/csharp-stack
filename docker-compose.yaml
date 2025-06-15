@@ -48,7 +48,7 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8081
       ConnectionStrings__DefaultConnection: "Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}"
-      GoogleAuth__ClientId: ${GOOGLE_CLIENT_ID}
+      GoogleAuth__ClientId: ${GoogleAuth__ClientId}
       Jwt__Key: ${JWT_KEY}
     ports:
       - "8081:8081"
