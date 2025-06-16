@@ -55,7 +55,7 @@ dotnet ef migrations add <NameOfMigration>
 Build the project, alias the CLI:
 
 ```bash
-dotnet build
+dotnet build ./src/Cli
 alias cli=./src/Cli/bin/Debug/net9.0/Cli
 ```
 
