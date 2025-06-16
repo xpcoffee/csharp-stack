@@ -49,3 +49,24 @@ Make changes to the entities & then add a new migration:
 ```bash
 dotnet ef migrations add <NameOfMigration>
 ```
+
+## Using the CLI
+
+Build the project, alias the CLI:
+
+```bash
+dotnet build
+alias cli=./src/Cli/bin/Debug/net9.0/Cli
+```
+
+Authenticate using Google auth (assuming you're calling against the local stack):
+
+```bash
+cli authenticate -e http://localhost:8081
+```
+
+List users:
+
+```bash
+cli list-users -e http://localhost:8081
+```
