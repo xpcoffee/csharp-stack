@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
 
+namespace Cli.Authentication.Google;
+
 public class GoogleDeviceFlowAuth
 {
     private readonly HttpClient _httpClient;
@@ -138,6 +140,15 @@ public class GoogleDeviceFlowAuth
         _httpClient?.Dispose();
     }
 }
+
+public class GoogleAuthConfig
+{
+    public static readonly string ConfigSectionName = "GoogleAuth";
+    public string ClientId { get; set; } = string.Empty;
+    public string ClientSecret { get; set; } = string.Empty;
+}
+
+
 
 // Data models for JSON responses
 public class DeviceCodeResponse

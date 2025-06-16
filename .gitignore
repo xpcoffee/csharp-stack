@@ -3,3 +3,4 @@ pgadmin-dev-setup/output
 Debug
 obj
 .git
+.csharp-stack-cli-jwt.txt
